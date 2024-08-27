@@ -4,7 +4,7 @@
 $zipUrl = "https://github.com/static-archives/Celery/raw/main/Release.zip"
 
 # Destination paths
-$outputPath = "D:\Celery\somefile.zip"
+$outputPath = "D:\Celery\Release.zip"
 $extractPath = "D:\Celery"
 
 # Download the ZIP file
