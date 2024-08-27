@@ -14,19 +14,19 @@ function Download-And-Extract {
 
     # Download the ZIP file
     try {
-        Invoke-WebRequest -Uri $zipUrl -OutFile $outputPath
+        Invoke-WebRequest -Uri $zipUrl -OutFile $outputPath -ErrorAction Stop
         Show-MessageBox -message "Download complete."
     } catch {
-        Show-MessageBox -message "Failed to download the file."
+        Show-MessageBox -message "Failed to download the file. $_"
         return
     }
 
     # Extract the ZIP file
     try {
-        Expand-Archive -Path $outputPath -DestinationPath $extractPath -Force
+        Expand-Archive -Path $outputPath -DestinationPath $extractPath -Force -ErrorAction Stop
         Show-MessageBox -message "Extraction complete."
     } catch {
-        Show-MessageBox -message "Failed to extract the file."
+        Show-MessageBox -message "Failed to extract the file. $_"
     }
 }
 
