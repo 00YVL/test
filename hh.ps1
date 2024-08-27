@@ -1,38 +1,61 @@
-# Load the required assemblies
 Add-Type -AssemblyName System.Windows.Forms
 
-# Create a new form
-$form = New-Object System.Windows.Forms.Form
-$form.Text = "Install Celery"
-$form.Size = New-Object System.Drawing.Size(300, 150)
-$form.StartPosition = "CenterScreen"
+function Show-MessageBox {
+    param (
+        [string]$message
+    )
+    [System.Windows.Forms.MessageBox]::Show($message)
+}
 
-# Create a button for installation
-$buttonInstall = New-Object System.Windows.Forms.Button
-$buttonInstall.Location = New-Object System.Drawing.Point(50, 30)
-$buttonInstall.Size = New-Object System.Drawing.Size(200, 40)
-$buttonInstall.Text = "Install Celery"
-$form.Controls.Add($buttonInstall)
-
-# Define the installation function
-$buttonInstall.Add_Click({
-    $url = "https://github.com/static-archives/Celery/raw/main/Release.zip"
-    $installPath = [System.IO.Path]::Combine([System.Environment]::GetFolderPath('LocalApplicationData'), "Celery")
-    $zipPath = [System.IO.Path]::Combine($installPath, "Release.zip")
-
-    # Create installation directory if it doesn't exist
-    if (-not (Test-Path $installPath)) {
-        New-Item -ItemType Directory -Path $installPath -Force
-    }
+function Download-And-Extract {
+    $zipUrl = "https://github.com/static-archives/Celery/raw/main/Release.zip"
+    $outputPath = "D:\Celery\Release.zip"
+    $extractPath = "D:\Celery"
 
     # Download the ZIP file
-    Invoke-WebRequest -Uri $url -OutFile $zipPath
+    try {
+        Invoke-WebRequest -Uri $zipUrl -OutFile $outputPath
+        Show-MessageBox -message "Download complete."
+    } catch {
+        Show-MessageBox -message "Failed to download the file."
+        return
+    }
 
     # Extract the ZIP file
-    Expand-Archive -Path $zipPath -DestinationPath $installPath -Force
+    try {
+        Expand-Archive -Path $outputPath -DestinationPath $extractPath -Force
+        Show-MessageBox -message "Extraction complete."
+    } catch {
+        Show-MessageBox -message "Failed to extract the file."
+    }
+}
 
-    [System.Windows.Forms.MessageBox]::Show("Celery installation complete.", "Success", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information)
-})
+function Check-Installation {
+    $checkPath = "D:\Celery\SomeFile.txt" # Adjust to check for a specific file indicating installation
+    if (Test-Path $checkPath) {
+        Show-MessageBox -message "Celery is already installed."
+    } else {
+        Show-MessageBox -message "Celery is not installed."
+    }
+}
 
-# Show the form
+$form = New-Object System.Windows.Forms.Form
+$form.Text = "Celery Installer"
+$form.Size = New-Object System.Drawing.Size(300, 200)
+$form.StartPosition = "CenterScreen"
+
+$installButton = New-Object System.Windows.Forms.Button
+$installButton.Location = New-Object System.Drawing.Point(10, 10)
+$installButton.Size = New-Object System.Drawing.Size(260, 40)
+$installButton.Text = "Download and Extract Celery"
+$installButton.Add_Click({ Download-And-Extract })
+$form.Controls.Add($installButton)
+
+$checkButton = New-Object System.Windows.Forms.Button
+$checkButton.Location = New-Object System.Drawing.Point(10, 60)
+$checkButton.Size = New-Object System.Drawing.Size(260, 40)
+$checkButton.Text = "Check Installation"
+$checkButton.Add_Click({ Check-Installation })
+$form.Controls.Add($checkButton)
+
 $form.ShowDialog()
